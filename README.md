@@ -18,9 +18,13 @@ Welp geomtrize the images
 - Fast generator: fast but doesn't look good
 ## Comparision
 These are images were generated with my tool (200 obj)
+
 ![Original](https://github.com/Brain-Flooder/Geomethat/blob/main/example/old_img.jpg?raw=true)
+
 ![Accurate gen](https://github.com/Brain-Flooder/Geomethat/blob/main/example/accurate.png?raw=true)
+
 ![Fast gen](https://github.com/Brain-Flooder/Geomethat/blob/main/example/fast.png?raw=true)
+
 Source: Search Corgi on Wikipedia.
 # Known issues
 None for now (yay)
