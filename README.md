@@ -1,7 +1,5 @@
 # Geomethat
 Welp geomtrize the images
-# WARNING
-This branch is UNSTABLE. Use at your own risk.
 ## Installation
 ### Exe file
 1. Go to the [latest releases](https://github.com/Brain-Flooder/Geomethat/releases/latest)
