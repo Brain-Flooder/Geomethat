@@ -60,10 +60,7 @@ while True:
     if event == 'Save':
         file = sg.popup_get_file(
             'Save image as',
-            save_as=True,
-            file_types=(
-                ('PNG image','*.png*'),
-            )
+            save_as=True
         )
         try:
             old_image.save(file+'.png')
