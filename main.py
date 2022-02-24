@@ -1,6 +1,31 @@
-import PySimpleGUI as sg
-import os,webbrowser
+"""
+MIT License
+
+Copyright (c) 2022 Brain-Flooder
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+import os
+import webbrowser
 import random
+import PySimpleGUI as sg
 from PIL import Image, ImageTk, ImageDraw, ImageChops, ImageStat
 
 sg.theme('SystemDefault1')
@@ -28,7 +53,6 @@ window = sg.Window(
 )
 
 image_hehe = Image.Image()
-old_image_path = ''
 old_image = Image.Image()
 
 while True:
@@ -48,9 +72,8 @@ while True:
                 ('*JPEG image* *PNG image*','*.jpeg* *.png* *.jpg*'),
             )
         )
-        if file == None or file == '' or not os.path.exists(file):
+        if file is None or file == '' or not os.path.exists(file):
             continue
-        old_image_path = file
         with Image.open(file)as img:
             img = img.convert('RGBA')
             old_image = img.copy()
@@ -75,8 +98,8 @@ while True:
         dominant_color = dominant_img.getpixel((0,0))
         new_image = Image.new(mode='RGBA',size=[image.width,image.height],color=dominant_color)
         for x in range(shapes):
-            best_scores = 0.0
-            radius = 1
+            BEST_SCORE = 0.0
+            RADIUS = 5
             good_image = Image.new(
                 mode='RGBA',
                 size=[image.width,image.height],
@@ -101,7 +124,7 @@ while True:
                     good_image = test_image
             new_image = good_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
-        old_image =new_image.copy()
+        old_image = new_image.copy()
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
@@ -122,18 +145,21 @@ while True:
             color=dominant_color
         )
         for x in range(shapes):
-            radius = 10
             test_image = new_image.copy()
             random_x_pos = random.randint(1,image.width-1)
             random_y_pos = random.randint(1,image.height-1)
             color = image.getpixel((random_x_pos, random_y_pos))
             draw = ImageDraw.Draw(test_image)
-            draw.regular_polygon(bounding_circle=[random_x_pos,random_y_pos,radius],fill=color,n_sides=sides)
+            draw.regular_polygon(
+                bounding_circle=[random_x_pos,random_y_pos,10],
+                fill=color,
+                n_sides=sides
+            )
             new_image = test_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
-        old_image =new_image.copy()
+        old_image = new_image.copy()
 
 window.close()
