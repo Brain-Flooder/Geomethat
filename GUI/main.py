@@ -1,6 +1,5 @@
+import os,webbrowser,random
 import PySimpleGUI as sg
-import os,webbrowser
-import random
 from PIL import Image, ImageTk, ImageDraw, ImageChops, ImageStat
 
 sg.theme('SystemDefault1')
@@ -28,7 +27,6 @@ window = sg.Window(
 )
 
 image_hehe = Image.Image()
-old_image_path = ''
 old_image = Image.Image()
 
 while True:
@@ -48,9 +46,8 @@ while True:
                 ('*JPEG image* *PNG image*','*.jpeg* *.png* *.jpg*'),
             )
         )
-        if file == None or file == '' or not os.path.exists(file):
+        if file is None or file == '' or not os.path.exists(file):
             continue
-        old_image_path = file
         with Image.open(file)as img:
             img = img.convert('RGBA')
             old_image = img.copy()
@@ -101,7 +98,7 @@ while True:
                     good_image = test_image
             new_image = good_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
-        old_image =new_image.copy()
+        old_image = new_image.copy()
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
@@ -122,18 +119,21 @@ while True:
             color=dominant_color
         )
         for x in range(shapes):
-            radius = 10
             test_image = new_image.copy()
             random_x_pos = random.randint(1,image.width-1)
             random_y_pos = random.randint(1,image.height-1)
             color = image.getpixel((random_x_pos, random_y_pos))
             draw = ImageDraw.Draw(test_image)
-            draw.regular_polygon(bounding_circle=[random_x_pos,random_y_pos,radius],fill=color,n_sides=sides)
+            draw.regular_polygon(
+                bounding_circle=[random_x_pos,random_y_pos,10],
+                fill=color,
+                n_sides=sides
+            )
             new_image = test_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
-        old_image =new_image.copy()
+        old_image = new_image.copy()
 
 window.close()
