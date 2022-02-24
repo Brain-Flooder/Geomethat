@@ -1,7 +1,5 @@
 import random
-import warnings
-from PIL import Image, ImageTk, ImageDraw, ImageChops, ImageStat
-import time
+from PIL import Image, ImageDraw, ImageChops, ImageStat
 
 def geometrize_accurate(image:Image, shapes:int = 5000, sides:int = 3):
     """
