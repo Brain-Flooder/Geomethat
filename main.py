@@ -119,8 +119,8 @@ while True:
                 stat = ImageStat.Stat(diff_img)
                 image_accuracy = 100 - (sum(stat.mean) / (len(stat.mean) * 255) * 100)
                 radius+=5
-                if image_accuracy > best_scores:
-                    best_scores = image_accuracy
+                if image_accuracy > best_score:
+                    best_score = image_accuracy
                     good_image = test_image
             new_image = good_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
