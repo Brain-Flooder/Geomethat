@@ -1,9 +1,14 @@
 import PySimpleGUI as sg
-import os,time
+import os,webbrowser
 import random
 from PIL import Image, ImageTk, ImageDraw, ImageChops, ImageStat
 
 sg.theme('SystemDefault1')
+
+menu_def = [
+    ['File',['Open','Save']],
+    ['Help',['About','Open an issue','Contact']]
+]
 
 column_settings = sg.Column([
     [sg.Text('Shapes'), sg.Input('1000',size=[10,30],key='shapes')],
@@ -12,27 +17,32 @@ column_settings = sg.Column([
 ])
 
 layout = [
-    [sg.Text('Select an image'),sg.Button('Browse',key='browse')],
-    [sg.Image(key='image',size=[500,500]),column_settings]
+    [sg.Menu(menu_def)],
+    [sg.Image(key='image',size=[500,500]),sg.VerticalSeparator(pad=None),column_settings]
 ]
 window = sg.Window(
     title='Geomethat',
     layout = layout,
     icon='./assets/icon.ico',
     resizable=True,
-    use_ttk_buttons=True,
-    ttk_theme='clam',
     titlebar_icon='./assets/icon.ico'
 )
 
+image_hehe = Image.Image()
 old_image_path = ''
 old_image = Image.Image()
 
 while True:
     event, values = window.read()
+    if event == 'About':
+        webbrowser.open('https://github.com/Brain-Flooder/Geomethat')
+    if event == 'Open an issue':
+        webbrowser.open('https://github.com/Brain-Flooder/Geomethat/issues')
+    if event == 'Contact':
+        webbrowser.open('https://github.com/Brain-Flooder')
     if event == sg.WIN_CLOSED:
         break
-    if event == 'browse':
+    if event == 'Open':
         file = sg.popup_get_file(
             'Select an image',
             file_types=(
@@ -43,12 +53,25 @@ while True:
             continue
         old_image_path = file
         with Image.open(file)as img:
-            img.convert('RGBA')
+            img = img.convert('RGBA')
             old_image = img.copy()
             img.thumbnail((500,500))
             window['image'].update(data = ImageTk.PhotoImage(img),visible=True,size=[500,500])
+    if event == 'Save':
+        file = sg.popup_get_file(
+            'Save image as',
+            save_as=True,
+            file_types=(
+                ('PNG image','*.png*'),
+            )
+        )
+        try:
+            old_image.save(file+'.png')
+            sg.popup(f'Saved as {file}.png')
+        except:
+            sg.popup_error('Unable to save the image')
     if event == 'accurate':
-        image = old_image
+        image = old_image.copy()
         shapes = int(values['shapes'])
         sides = int(values['sides'])
         if shapes <= 0:
@@ -77,16 +100,12 @@ while True:
                     good_image = test_image
             new_image = good_image
             sg.one_line_progress_meter('Generating...',x+1,shapes)
+        old_image =new_image.copy()
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
-        if sg.popup_ok_cancel('Do you want to save the file/') == 'OK':
-            folder = sg.popup_get_folder('Save file in...')
-            new_image.save(f"{folder}/{values['name']}.png")
-        else:
-            pass
     if event == 'fast':
-        image = old_image
+        image = old_image.copy()
         shapes = int(values['shapes'])
         sides = int(values['sides'])
         image.convert('RGBA')
@@ -109,9 +128,6 @@ while True:
         thumbnail = new_image.copy()
         thumbnail.thumbnail((500,500))
         window['image'].update(data = ImageTk.PhotoImage(thumbnail),visible=True,size=[500,500])
-        if sg.popup_ok_cancel('Do you want to save the file/') == 'OK':
-            sg.FileSaveAs(filetypes=('*PNG image*','.png'))
-        else:
-            pass
+        old_image =new_image.copy()
 
 window.close()
