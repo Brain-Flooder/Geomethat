@@ -2,7 +2,7 @@
 Welp geomtrize the images
 ## Installation
 ### Exe file
-1. Go to the [releases](https://github.com/Brain-Flooder/Geomethat/releases/)
+1. Go to the [latest releases](https://github.com/Brain-Flooder/Geomethat/releases/latest)
 2. Download the `.exe` and run it
 3. Done
 ### Build from source
