@@ -74,8 +74,10 @@ while True:
         dominant_color = dominant_img.getpixel((0,0))
         new_image = Image.new(mode='RGBA',size=[image.width,image.height],color=dominant_color)
         for x in range(shapes):
-            best_scores = 0.0
+            best_scores = 100.0
+            best_score -= 100.0
             radius = 1
+            radius += 4
             good_image = Image.new(
                 mode='RGBA',
                 size=[image.width,image.height],
@@ -139,3 +141,4 @@ while True:
         old_image = new_image.copy()
 
 window.close()
+
