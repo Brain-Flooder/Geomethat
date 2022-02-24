@@ -10,3 +10,5 @@ Welp geomtrize the images
 # Pros and Cons
 - Accurate generator: slow (same objects take x5 times longer than fast generator) but accurate.
 - Fast generator: fast but doesn't look good
+# Known issues
+- Not work if resoluiton < 500x500
