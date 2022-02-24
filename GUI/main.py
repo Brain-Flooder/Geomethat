@@ -23,9 +23,8 @@ layout = [
 window = sg.Window(
     title='Geomethat',
     layout = layout,
-    icon='./assets/icon.ico',
+    icon=r'.\assets\icon.ico',
     resizable=True,
-    titlebar_icon='./assets/icon.ico'
 )
 
 image_hehe = Image.Image()
@@ -62,17 +61,15 @@ while True:
             'Save image as',
             save_as=True
         )
-        try:
-            old_image.save(file+'.png')
-            sg.popup(f'Saved as {file}.png')
-        except:
-            sg.popup_error('Unable to save the image')
+        old_image.save(file+'.png')
+        sg.popup(f'Saved as {file}.png')
     if event == 'accurate':
         image = old_image.copy()
         shapes = int(values['shapes'])
         sides = int(values['sides'])
         if shapes <= 0:
-            raise ValueError('Please resize your attribute(s)')
+            sg.popup_error('Please resize your attribute(s)')
+            continue
         dominant_img = image.copy()
         dominant_img.resize((1,1))
         dominant_color = dominant_img.getpixel((0,0))
@@ -107,7 +104,8 @@ while True:
         sides = int(values['sides'])
         image.convert('RGBA')
         if shapes <= 0:
-            raise ValueError('Please resize your attribute(s)')
+            sg.popup_error('Please resize your attribute(s)')
+            continue
         dominant_img = image.copy()
         dominant_img.resize((1,1))
         dominant_color = dominant_img.getpixel((0,0))
