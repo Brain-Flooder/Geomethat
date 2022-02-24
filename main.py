@@ -163,4 +163,4 @@ while True:
         old_image = new_image.copy()
 
 window.close()
-
+ 
