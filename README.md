@@ -1,7 +1,7 @@
 # Geomethat
 Welp geomtrize the images
 ## Installation
-### Exe file (No longer supported due to lack of testing)
+### Exe file (Windows 32bits tested only)
 1. Go to the [latest releases](https://github.com/Brain-Flooder/Geomethat/releases/latest)
 2. Download the `.exe` and run it
 3. Done
