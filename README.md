@@ -19,7 +19,6 @@ Welp geomtrize the images
 
 based on [Primitive](https://github.com/fogleman/primitive)
 
-
 ![Original](https://github.com/Brain-Flooder/Geomethat/blob/main/example/old_img.jpg?raw=true)
 
 ![My Tool](https://github.com/Brain-Flooder/Geomethat/blob/main/example/accurate.png?raw=true)
