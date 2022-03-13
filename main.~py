@@ -157,7 +157,6 @@ while True:
             window['image'].update(data = ImageTk.PhotoImage(thumbnail),size=[500,500])
             for x in keys_thingy:
                 window[x].update(disabled = False)
-            window['menu'].update(disabled_menu_def)
     except:
         sg.popup_scrolled(traceback.format_exc(),title='A wild error just appeared!')
 
