@@ -1,4 +1,6 @@
 # Geomethat
+[![CodeFactor](https://www.codefactor.io/repository/github/brain-flooder/geomethat/badge/main)](https://www.codefactor.io/repository/github/brain-flooder/geomethat/overview/main)
+
 Welp geomtrize the images
 ## Installation
 ### Exe file (Windows 32bits tested only)
