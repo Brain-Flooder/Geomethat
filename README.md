@@ -1,24 +1,24 @@
 # Geomethat
-[![CodeFactor](https://www.codefactor.io/repository/github/brain-flooder/geomethat/badge/main)](https://www.codefactor.io/repository/github/brain-flooder/geomethat/overview/main)
-
 Welp geomtrize the images
 ## Installation
-### Exe file (Windows 32bits tested only)
+### Exe file
 1. Go to the [latest releases](https://github.com/Brain-Flooder/Geomethat/releases/latest)
 2. Download the `.exe` and run it
 3. Done
-### Build from source (Install Python and add to PATH first)
+### Build from source
 1. Download the repo
 2. Use `pip install -r requirements.txt` to install dependencies
-3. Run `main.py`
+3. Go to the `GUI` folder and run `main.py`
 4. Enjoy
 ## Usage
-1. Click `File` -> `Open` or `Open File` button and choose generator's options
-2. After generating, choose `File` -> `Save as` or `Save File`
-3. Done :)
+1. Click `File` -> `Open` and choose generator's options
+2. Choose `Accurate generator` or `Fast generator`
+3. After generating, choose `File` -> `Save as` 
+4. Done :)
 ## How this work
 
-Based on [Primitive](https://github.com/fogleman/primitive) (maybe)
+based on [Primitive](https://github.com/fogleman/primitive)
+
 
 ![Original](https://github.com/Brain-Flooder/Geomethat/blob/main/example/old_img.jpg?raw=true)
 
