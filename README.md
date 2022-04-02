@@ -11,14 +11,12 @@ Welp geomtrize the images
 3. Go to the `GUI` folder and run `main.py`
 4. Enjoy
 ## Usage
-1. Click `File` -> `Open` and choose generator's options
-2. Choose `Accurate generator` or `Fast generator`
-3. After generating, choose `File` -> `Save as` 
+1. Click `File` -> `Open File` or `Open file` and choose generator's options
+2. Choose `Geometrize`
+3. After generating, choose `File` -> `Save File` or  `Save file`
 4. Done :)
 ## How this work
-
-based on [Primitive](https://github.com/fogleman/primitive)
-
+Put a random shape at a place with different size
 
 ![Original](https://github.com/Brain-Flooder/Geomethat/blob/main/example/old_img.jpg?raw=true)
 
