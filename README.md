@@ -18,7 +18,7 @@ Welp geomtrize the images
 ## How this work
 1. Put a random shape at a place with different size (Repeat 10 times).
 2. Get the shape has the highest score compare to the original
-3. Repeat step `1.` and `2.` for the shapes input
+3. Repeat step `1.` and `2.` in range of shapes input
 
 ![Original](https://github.com/Brain-Flooder/Geomethat/blob/main/example/old_img.jpg?raw=true)
 
