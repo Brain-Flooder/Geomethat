@@ -167,7 +167,7 @@ while True:
             except ValueError:
                 sg.popup_error('Invalid file path.')
                 continue
-            sg.popup(f'Saved as {file}.png')
+            sg.popup(f'Saved as {file}')
 
         if event == 'import':
             file = sg.popup_get_file(
@@ -217,6 +217,8 @@ while True:
                     )
 
                     X+=1
+
+                old_image = new_image.copy()
 
             sg.popup('Successfully imported')
 
