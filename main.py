@@ -18,15 +18,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import traceback
 import os
 import webbrowser
 import random
 import platform
 import json
+from io import BytesIO
 
+import requests
 import PySimpleGUI as sg
 from PIL import Image, ImageTk, ImageDraw, ImageChops, ImageStat
+from urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 THEME = 'default'
 
@@ -35,7 +39,17 @@ if platform.system() == 'Windows':
 
 sg.theme('SystemDefault1')
 
-keys_thingy = ['Geometrize', 'Open File', 'Save File','shapes','sides']
+keys_thingy = [
+    'Geometrize',
+    'Open File',
+    'Save File',
+    'shapes',
+    'sides',
+    'import',
+    'export',
+    'load',
+    'url'
+]
 
 menu_def = [
     ['File',['Open &File','&Save File']],
@@ -50,12 +64,28 @@ disabled_menu_def = [
 frame_settings = sg.Frame(
     'Options',
     [
-        [sg.Text('Shapes'), sg.Input('1000',size=[10,30],key='shapes')],
+        [
+            sg.Text('Shapes'),
+            sg.Input('1000',size=[10,30],key='shapes',expand_x=True)
+        ],
         [
             sg.Text('Sides'),
-            sg.Spin([x for x in range(3,361)],key='sides',expand_x=True)
+            sg.Spin(list(range(3,361)),key='sides',expand_x=True)
         ],
         [sg.Button('Geometrize',key='Geometrize',expand_x=True)],
+        [
+            sg.Button(
+                'Open file',
+                key='Open File',
+                expand_x=True
+            ),
+            sg.Button('Save file', key='Save File', expand_x=True)
+        ],
+        [sg.Text('Open from URL')],
+        [
+            sg.Input(expand_x=True,key='url'),
+            sg.OK('Load',key='load')
+        ],
         [
             sg.Button(
                 'Export',
@@ -73,8 +103,7 @@ frame_settings = sg.Frame(
     expand_y=True
 )
 
-frame_image = sg.Frame(
-    'Geometrizer',
+image_column = sg.Column(
     [
         [sg.ProgressBar(
             1000,
@@ -85,14 +114,13 @@ frame_image = sg.Frame(
         )
         ],
         [
-            sg.Button(
-                'Open file',
-                key='Open File',
-                expand_x=True
-            ),
-            sg.Button('Save file', key='Save File', expand_x=True)
-        ],
-        [sg.Image(key='image',size=[500,500])]
+            sg.Image(
+                key='image',
+                size=[500,500],
+                expand_x=True,
+                expand_y=True
+            )
+        ]
     ],
     expand_x=True,
     expand_y=True
@@ -100,7 +128,7 @@ frame_image = sg.Frame(
 
 layout = [
     [sg.Menu(menu_def,key='menu')],
-    [frame_image,frame_settings]
+    [image_column,frame_settings]
 ]
 window = sg.Window(
     title='Geomethat',
@@ -116,205 +144,107 @@ image_hehe = Image.Image()
 old_image = Image.Image()
 
 while True:
-    try:
-        event, values = window.read()
+    event, values = window.read()
 
-        if event == 'About':
-            webbrowser.open('https://github.com/Brain-Flooder/Geomethat')
+    if event == 'About':
+        webbrowser.open('https://github.com/Brain-Flooder/Geomethat')
 
-        if event == 'Open an issue':
-            webbrowser.open('https://github.com/Brain-Flooder/Geomethat/issues')
+    if event == 'Open an issue':
+        webbrowser.open('https://github.com/Brain-Flooder/Geomethat/issues')
 
-        if event == 'Contact':
-            webbrowser.open('https://github.com/Brain-Flooder')
+    if event == 'Contact':
+        webbrowser.open('https://github.com/Brain-Flooder')
 
-        if event == sg.WIN_CLOSED:
-            break
+    if event == sg.WIN_CLOSED:
+        break
 
-        if event == 'Open File':
-            file = sg.popup_get_file(
-                'Select an image',
-                no_window=True,
-                file_types=(
-                    ('*JPEG image* *PNG image*','*.jpeg* *.png* *.jpg*'),
-                )
+    if event == 'Open File':
+        file = sg.popup_get_file(
+            'Select an image',
+            no_window=True,
+            file_types=(
+                ('*JPEG image* *PNG image*','*.jpeg* *.png* *.jpg*'),
             )
-            if file is None or file == '' or not os.path.exists(file):
-                continue
-            with Image.open(file)as img:
-                img = img.convert('RGBA')
-                old_image = img.copy()
-                img.thumbnail((500,500))
-                window['image'].update(
-                    data = ImageTk.PhotoImage(img),
-                    visible=True,
-                    size=[500,500]
-                )
-
-        if event == 'Save File':
-            file = sg.popup_get_file(
-                'Save image as',
-                file_types=(
-                    ('PNG image','*.png'),
-                ),
-                no_window=True,
-                save_as=True
+        )
+        if file is None or file == '' or not os.path.exists(file):
+            continue
+        with Image.open(file) as img:
+            img = img.convert('RGBA')
+            old_image = img.copy()
+            img.thumbnail((500,500))
+            window['image'].update(
+                data = ImageTk.PhotoImage(img),
+                visible=True,
+                size=[500,500]
             )
-            if file is None or file == '':
-                continue
-            try:
-                old_image.save(file)
-            except ValueError:
-                sg.popup_error('Invalid file path.')
-                continue
-            sg.popup(f'Saved as {file}')
-
-        if event == 'import':
-            file = sg.popup_get_file(
-                'Select an image',
-                no_window=True,
-                file_types=(
-                    ('*JSON File*','*.json*'),
-                )
+    if event == 'load':
+        r = requests.get(values['url'], verify=True)
+        img = r.content
+        with Image.open(BytesIO(img)) as img:
+            img = img.convert('RGBA')
+            old_image = img.copy()
+            img.thumbnail((500,500))
+            window['image'].update(
+                data = ImageTk.PhotoImage(img),
+                visible=True,
+                size=[500,500]
             )
 
-            if file is None or file == '' or not os.path.exists(file):
-                continue
+    if event == 'Save File':
+        file = sg.popup_get_file(
+            'Save image as',
+            file_types=(
+                ('PNG image','*.png'),
+            ),
+            no_window=True,
+            save_as=True
+        )
+        if file is None or file == '':
+            continue
+        try:
+            old_image.save(file)
+        except ValueError:
+            sg.popup_error('Invalid file path.')
+            continue
+        sg.popup(f'Saved as {file}')
 
-            with open(file, encoding='UTF-8') as f:
-                json_data = json.loads(f.read())
-                new_image = Image.new(
-                    mode='RGBA',
-                    size=json_data['size'],
-                    color=tuple(json_data['color'])
-                )
-                draw = ImageDraw.Draw(new_image)
-
-                X = 0
-
-                for shape in json_data['shapes']:
-                    shape_position_and_thing = tuple(
-                        shape['bounding_circle']
-                    )
-
-                    draw.regular_polygon(
-                        bounding_circle=shape_position_and_thing,
-                        fill=tuple(shape['color']),
-                        n_sides=json_data['sides']
-                    )
-
-                    thumbnail = new_image.copy()
-                    thumbnail.thumbnail((500,500))
-                    window['image'].update(
-                        data = ImageTk.PhotoImage(thumbnail),
-                        size=[500,500]
-                    )
-
-                    window['progressbar'].update(
-                        X+1,
-                        len(json_data['shapes']),
-                        visible=True
-                    )
-
-                    X+=1
-
-                old_image = new_image.copy()
-
-            sg.popup('Successfully imported')
-
-        if event == 'export':
-            file = sg.popup_get_file(
-                'Save image as',
-                file_types=(
-                    ('JSON files','*.json'),
-                ),
-                no_window=True,
-                save_as=True
+    if event == 'import':
+        file = sg.popup_get_file(
+            'Select an image',
+            no_window=True,
+            file_types=(
+                ('*JSON File*','*.json*'),
             )
+        )
 
-            if file is None or file == '':
-                continue
+        if file is None or file == '' or not os.path.exists(file):
+            continue
 
-            try:
-                with open(file,'w',encoding='UTF-8')as f:
-                    f.write(json.dumps(to_json))
+        for x in keys_thingy:
+            window[x].update(disabled = True)
 
-            except ValueError:
-                sg.popup_error('Invalid file path.')
-                continue
-
-            sg.popup(f'Saved as {file}.png')
-
-        if event == 'Geometrize':
-            for x in keys_thingy:
-                window[x].update(disabled = True)
-
-            window['menu'].update(disabled_menu_def)
-            image = old_image.copy()
-            shapes = int(values['shapes'])
-            sides = int(values['sides'])
-
-            if shapes <= 0:
-                sg.popup_error('Please resize your attribute(s)')
-                continue
-
-            dominant_img = image.copy()
-            dominant_img.resize((1,1))
-            dominant_color = dominant_img.getpixel((0,0))
+        with open(file, encoding='UTF-8') as f:
+            json_data = json.loads(f.read())
             new_image = Image.new(
                 mode='RGBA',
-                size=[image.width,image.height],
-                color=dominant_color
+                size=json_data['size'],
+                color=tuple(json_data['color'])
             )
+            draw = ImageDraw.Draw(new_image)
 
-            to_json={
-                'color':dominant_color,
-                'size':[image.width,image.height],
-                'sides':sides
-            }
+            X = 0
 
-            shapes_export=[]
-
-            for x in range(shapes):
-
-                EXPORT_RADIUS = 3
-                BEST_SCORE = 0.0
-                RADIUS = 3
-                good_image = Image.new(
-                    mode='RGBA',
-                    size=[image.width,image.height],
-                    color=dominant_color
+            for shape in json_data['shapes']:
+                shape_position_and_thing = tuple(
+                    shape['bounding_circle']
                 )
 
-                random_x_pos = random.randint(1,image.width-1)
-                random_y_pos = random.randint(1,image.height-1)
-                color = image.getpixel((random_x_pos, random_y_pos))
+                draw.regular_polygon(
+                    bounding_circle=shape_position_and_thing,
+                    fill=tuple(shape['color']),
+                    n_sides=json_data['sides']
+                )
 
-                for y in range(10):
-                    test_image = new_image.copy()
-
-                    draw = ImageDraw.Draw(test_image)
-
-                    draw.regular_polygon(
-                        bounding_circle=[random_x_pos,random_y_pos,RADIUS],
-                        fill=color,
-                        n_sides=sides
-                    )
-
-                    diff_img = ImageChops.difference(image, test_image)
-                    stat = ImageStat.Stat(diff_img)
-                    image_accuracy = 100 - (
-                        sum(stat.mean) / (len(stat.mean) * 255) * 100
-                    )
-
-                    RADIUS+=5
-
-                    if image_accuracy > BEST_SCORE:
-                        BEST_SCORE = image_accuracy
-                        good_image = test_image
-                        EXPORT_RADIUS = RADIUS
-
-                new_image = good_image.copy()
                 thumbnail = new_image.copy()
                 thumbnail.thumbnail((500,500))
                 window['image'].update(
@@ -322,20 +252,114 @@ while True:
                     size=[500,500]
                 )
 
-                window['progressbar'].update(x+1,shapes,visible=True)
-
-                shapes_export.append(
-                    {
-                        'bounding_circle':(
-                            random_x_pos,
-                            random_y_pos,
-                            EXPORT_RADIUS
-                        ),
-                        'color':color
-                    }
+                window['progressbar'].update(
+                    X+1,
+                    len(json_data['shapes']),
+                    visible=True
                 )
 
+                X+=1
+
             old_image = new_image.copy()
+
+        for x in keys_thingy:
+            window[x].update(disabled = False)
+
+        sg.popup('Successfully imported')
+
+    if event == 'export':
+        file = sg.popup_get_file(
+            'Save image as',
+            file_types=(
+                ('JSON files','*.json'),
+            ),
+            no_window=True,
+            save_as=True
+        )
+
+        if file is None or file == '':
+            continue
+
+        try:
+            with open(file,'w',encoding='UTF-8')as f:
+                f.write(json.dumps(to_json))
+
+        except ValueError:
+            sg.popup_error('Invalid file path.')
+            continue
+
+        sg.popup(f'Saved as {file}')
+
+    if event == 'Geometrize':
+        for x in keys_thingy:
+            window[x].update(disabled = True)
+
+        window['menu'].update(disabled_menu_def)
+        image = old_image.copy()
+        shapes = int(values['shapes'])
+        sides = int(values['sides'])
+
+        if shapes <= 0:
+            sg.popup_error('Please resize your attribute(s)')
+            continue
+
+        dominant_img = image.copy()
+        dominant_img.resize((1,1))
+        dominant_color = dominant_img.getpixel((0,0))
+        new_image = Image.new(
+            mode='RGBA',
+            size=[image.width,image.height],
+            color=dominant_color
+        )
+
+        to_json={
+            'color':dominant_color,
+            'size':[image.width,image.height],
+            'sides':sides
+        }
+
+        shapes_export=[]
+
+        for x in range(shapes):
+
+            EXPORT_RADIUS = 3
+            BEST_SCORE = 0.0
+            RADIUS = 3
+            good_image = Image.new(
+                mode='RGBA',
+                size=[image.width,image.height],
+                color=dominant_color
+            )
+
+            random_x_pos = random.randint(1,image.width-1)
+            random_y_pos = random.randint(1,image.height-1)
+            color = image.getpixel((random_x_pos, random_y_pos))
+
+            for y in range(10):
+                test_image = new_image.copy()
+
+                draw = ImageDraw.Draw(test_image)
+
+                draw.regular_polygon(
+                    bounding_circle=[random_x_pos,random_y_pos,RADIUS],
+                    fill=color,
+                    n_sides=sides
+                )
+
+                diff_img = ImageChops.difference(image, test_image)
+                stat = ImageStat.Stat(diff_img)
+                image_accuracy = 100 - (
+                    sum(stat.mean) / (len(stat.mean) * 255) * 100
+                )
+
+                RADIUS+=5
+
+                if image_accuracy > BEST_SCORE:
+                    BEST_SCORE = image_accuracy
+                    good_image = test_image
+                    EXPORT_RADIUS = RADIUS
+
+            new_image = good_image.copy()
             thumbnail = new_image.copy()
             thumbnail.thumbnail((500,500))
             window['image'].update(
@@ -343,17 +367,32 @@ while True:
                 size=[500,500]
             )
 
-            for x in keys_thingy:
-                window[x].update(disabled = False)
-            window['menu'].update(disabled_menu_def)
-            to_json['shapes'] = shapes_export
+            window['progressbar'].update(x+1,shapes,visible=True)
 
-            sg.popup('Geometrization completed')
+            shapes_export.append(
+                {
+                    'bounding_circle':(
+                        random_x_pos,
+                        random_y_pos,
+                        EXPORT_RADIUS
+                    ),
+                    'color':color
+                }
+            )
 
-    except Exception:
-        sg.popup_scrolled(
-            traceback.format_exc(),
-            title='A wild error just appeared!'
+        old_image = new_image.copy()
+        thumbnail = new_image.copy()
+        thumbnail.thumbnail((500,500))
+        window['image'].update(
+            data = ImageTk.PhotoImage(thumbnail),
+            size=[500,500]
         )
+
+        for x in keys_thingy:
+            window[x].update(disabled = False)
+        window['menu'].update(disabled_menu_def)
+        to_json['shapes'] = shapes_export
+
+        sg.popup('Geometrization completed')
 
 window.close()

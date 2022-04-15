@@ -1,4 +1,6 @@
 import sys
+import os
+
 from cx_Freeze import setup, Executable
 
 build_exe_options = {
@@ -14,7 +16,8 @@ build_exe_options = {
         "tkinter"
     ],
     "include_msvcr":True,
-    "excludes": []
+    "excludes": [],
+    "include_files":["./assets/"]
 }
 
 base = None
@@ -25,7 +28,9 @@ setup(
     name="Geometrat",
     version="1.2.0",
     description="Geometrize the images",
-    options={"build_exe": build_exe_options},
+    options={
+        "build_exe": build_exe_options
+    },
     executables=[
         Executable(
             "main.py",
